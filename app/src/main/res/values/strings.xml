@@ -6,4 +6,5 @@
     <string name="subject">Subject</string>
     <string name="grade">Grade</string>
     <string name="remove_subject">Remove subject</string>
+    <string name="select_pdf_marksheet">Select PDF Marksheet</string>
 </resources>
