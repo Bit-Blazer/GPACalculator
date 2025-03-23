@@ -7,4 +7,7 @@
     <string name="grade">Grade</string>
     <string name="remove_subject">Remove subject</string>
     <string name="select_pdf_marksheet">Select PDF Marksheet</string>
+    <string name="subjects">Subjects</string>
+    <string name="result">Result</string>
+    <string name="blank">-</string>
 </resources>
