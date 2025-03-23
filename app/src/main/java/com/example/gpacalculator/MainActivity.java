@@ -1,7 +1,6 @@
 package com.example.gpacalculator;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,10 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 
@@ -37,12 +39,34 @@ public class MainActivity extends AppCompatActivity implements PdfParser.PdfPars
     private Button selectPdfButton;
     private Button calculateButton;
     private int selectedSemester = 1;
-    private ProgressDialog progressDialog;
+    private AlertDialog progressDialog;
+    private ActivityResultLauncher<Intent> pdfPickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Register PDF launcher
+        pdfPickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                progressDialog.show();
+
+                Intent data = result.getData();
+                // Handle multiple files selection
+                if (data.getClipData() != null) {
+                    ClipData clipData = data.getClipData();
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        Uri uri = clipData.getItemAt(i).getUri();
+                        PdfParser.parseFromUri(uri, getContentResolver(), MainActivity.this);
+                    }
+                } else if (data.getData() != null) {
+                    // Handle single file selection
+                    Uri uri = data.getData();
+                    PdfParser.parseFromUri(uri, getContentResolver(), MainActivity.this);
+                }
+            }
+        });
 
         // Initialize PDFBox
         PDFBoxResourceLoader.init(getApplicationContext());
@@ -72,10 +96,9 @@ public class MainActivity extends AppCompatActivity implements PdfParser.PdfPars
         FloatingActionButton addSubjectButton = findViewById(R.id.add_subject_button);
         addSubjectButton.setOnClickListener(v -> addSubjectRow());
 
-        // Initialize progress dialog
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Parsing PDF...");
-        progressDialog.setCancelable(false);
+        // Create custom progress dialog using Material Components
+        View progressView = getLayoutInflater().inflate(R.layout.dialog_progress, null);
+        progressDialog = new MaterialAlertDialogBuilder(this).setView(progressView).setCancelable(false).create();
     }
 
     private void openPdfSelection() {
@@ -83,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements PdfParser.PdfPars
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/pdf");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(intent, READ_REQUEST_CODE);
+        pdfPickerLauncher.launch(intent);
     }
 
     @Override
@@ -156,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements PdfParser.PdfPars
 
         AutoCompleteTextView subjectSpinner = subjectRow.findViewById(R.id.subject_spinner);
         AutoCompleteTextView gradeSpinner = subjectRow.findViewById(R.id.grade_spinner);
-        MaterialButton removeButton = subjectRow.findViewById(R.id.remove_subject_button);
 
         // Prepare subject items with format: "ShortName - Full Name"
         List<String> subjectItems = new ArrayList<>();
@@ -182,8 +204,9 @@ public class MainActivity extends AppCompatActivity implements PdfParser.PdfPars
                 this, android.R.layout.simple_dropdown_item_1line, grades);
         gradeSpinner.setAdapter(gradeAdapter);
 
-        // Set up remove button functionality
-        removeButton.setOnClickListener(v -> {
+        // Set up the swipe dismiss functionality
+        SwipeDismissLayout swipeLayout = (SwipeDismissLayout) subjectRow;
+        swipeLayout.setDismissCallback(() -> {
             if (subjectViews.size() > 1) {
                 subjectsContainer.removeView(subjectRow);
                 subjectViews.remove(subjectRow);
