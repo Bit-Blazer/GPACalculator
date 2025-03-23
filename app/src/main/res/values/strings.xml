@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GPA Calculator</string>
+    <string name="add_subject">Add subject</string>
+    <string name="gpa_calculator">GPA Calculator</string>
+    <string name="calculate_gpa">CALCULATE GPA</string>
+    <string name="subject">Subject</string>
+    <string name="grade">Grade</string>
+    <string name="remove_subject">Remove subject</string>
+</resources>
