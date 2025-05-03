@@ -15,9 +15,19 @@ public class Subject {
         this.semester = semester;
     }
 
-    public String getCode() { return code; }
-    public String getName() { return name; }
-    public String getShortName() { return shortName; }
-    public int getCredits() { return credits; }
-    public int getSemester() { return semester; }
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
 }

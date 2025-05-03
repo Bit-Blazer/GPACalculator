@@ -4,8 +4,6 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 
@@ -21,11 +19,11 @@ public class PdfParser {
 
     public interface PdfParseListener {
         void onPdfParseSuccess(List<SubjectResult> subjectResults);
+
         void onPdfParseError(Exception e);
     }
 
-    public static void parseFromUri(Uri uri, ContentResolver contentResolver,
-                                    PdfParseListener listener) {
+    public static void parseFromUri(Uri uri, ContentResolver contentResolver, PdfParseListener listener) {
         new Thread(() -> {
             try {
                 List<SubjectResult> results = extractFromPdf(uri, contentResolver);
@@ -48,9 +46,7 @@ public class PdfParser {
         String text = pdfTextStripper.getText(document);
         document.close();
 
-        Matcher semPattern = Pattern.compile("Provisional Results for (.*) Examinations").matcher(text);
-
-        String regexPattern = getString(semPattern);
+        String regexPattern = "(2[123][A-Z]{2,3}\\d{2,3}[TL])\\s*(?:-\\s|\\s)([A-Za-z,\\s]+)\\s(A\\+?|B\\+?|C|O|U|AB)\\s";
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(text);
 
@@ -58,6 +54,7 @@ public class PdfParser {
             String subjectCode = matcher.group(1);
             String subjectName = matcher.group(2).trim();
             String grade = matcher.group(3);
+            System.out.println(subjectCode + " " + subjectName + " " + grade);
 
             results.add(new SubjectResult(subjectCode, subjectName, grade));
         }
@@ -65,35 +62,5 @@ public class PdfParser {
         return results;
     }
 
-    @NonNull
-    private static String getString(Matcher semPattern) {
-        String semester = "0";
-
-        if (semPattern.find()) {
-            switch (semPattern.group(1).trim()) {
-                case "MARCH 2023":
-                    semester = "1";
-                    break;
-                case "JUL 23":
-                    semester = "2";
-                    break;
-                case "November 2023":
-                    semester = "3";
-                    break;
-                case "MAY 2024":
-                    semester = "4";
-                    break;
-                case "NOV 2024":
-                    semester = "5";
-                    break;
-                default:
-                    semester = "0";
-                    break;
-            }
-        }
-
-        return semester + "\\s(2[123][A-Z]{2,3}\\d{2,3}[TL]) - ([A-Za-z,\\s]+)\\s(A\\+?|B\\+?|C|O|U|AB)\\s";
-
-    }
 
 }

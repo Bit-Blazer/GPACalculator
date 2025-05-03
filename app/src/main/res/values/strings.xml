@@ -3,4 +3,6 @@
     <string name="subject">Subject</string>
     <string name="grade">Grade</string>
     <string name="parsing_pdf">Parsing PDF…</string>
+    <string name="add_pdf">Add PDF</string>
+    <string name="settings">Settings</string>
 </resources>
