@@ -1,7 +1,9 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
 }
 
 allprojects {
@@ -10,7 +12,26 @@ allprojects {
         mavenCentral()
     }
 }
+
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+val keystorePropertiesFile = rootProject.file("keystore/keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+val keystoreProperties = Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
 android {
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
     namespace = "com.example.gpacalculator"
     compileSdk = 35
 
@@ -20,13 +41,16 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -36,30 +60,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = true
-        }
-    }
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx)
     implementation(libs.pdfbox.android)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
     implementation(libs.material)
 }
