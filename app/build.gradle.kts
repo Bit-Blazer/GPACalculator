@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 android {
     namespace = "com.example.gpacalculator"
     compileSdk = 35
@@ -20,11 +26,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = true
         }
     }
     compileOptions {
@@ -50,7 +52,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-    implementation (libs.pdfbox.android)
+    implementation(libs.pdfbox.android)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
