@@ -50,12 +50,12 @@ public class SubjectRepository {
                 // Semester 6
                 new Subject("21CS306T", "Mobile Computing", "MC", 3, 6),
                 new Subject("21CS307T", "Compiler Design", "CD", 3, 6),
-                new Subject("21CS308T", "Artificial Intelligence", "AI", 3, 6),
-                new Subject("21CS317T", "Software Project Management", "SPM", 4, 6),
-                new Subject("21MA301T", "Resource Management Techniques", "RMT", 1, 6),
+                new Subject("21CS308T", "Artificial Intelligence", "AI", 4, 6),
+                new Subject("21CS317T", "Software Project Management", "SPM", 3, 6),
+                new Subject("21MA301T", "Resource Management Techniques", "RMT", 3, 6),
                 new Subject("21OCE328T", "Disaster Management", "DM", 3, 6),
                 new Subject("21CS309L", "Mobile Application Development Laboratory", "MAD LAB", 1, 6),
-                new Subject("21CS310L", "Compiler Design Laboratory", "CD LAB", 3, 6),
+                new Subject("21CS310L", "Compiler Design Laboratory", "CD LAB", 1, 6),
                 new Subject("21CS311L", "Internship", "Intern", 1, 6),
                 new Subject("21CS312L", "Mini Project", "MP", 1, 6),
 
